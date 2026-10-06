@@ -1,0 +1,908 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Perulangan dan Pola — Informatika Kelas 8 | SMPN 19 Kota Bekasi</title>
+<style>
+/* ============ DASAR ============ */
+*{box-sizing:border-box}
+html,body{height:100%;margin:0;overflow:hidden;background:#050E1B;}
+body{
+  font-family:"Segoe UI",Inter,system-ui,-apple-system,Roboto,Helvetica,Arial,sans-serif;
+  color:var(--text);
+}
+:root{
+  --bg:#08172A; --bg2:#0F2A45;
+  --card:rgba(255,255,255,.07); --line:rgba(52,211,153,.28);
+  --accent:#34D399; --accent2:#FB923C; --accent3:#60A5FA; --pink:#F472B6;
+  --text:#EAF3FC; --muted:#9FB8D4;
+}
+
+/* ============ STAGE 16:9 ============ */
+#stage{
+  position:absolute; left:50%; top:50%;
+  width:1280px; height:720px;
+  transform-origin:center center;
+  overflow:hidden;
+  border-radius:14px;
+  box-shadow:0 30px 90px rgba(0,0,0,.65);
+  background:
+    radial-gradient(900px 620px at 10% 6%, rgba(52,211,153,.16), transparent 62%),
+    radial-gradient(820px 620px at 92% 96%, rgba(251,146,60,.14), transparent 62%),
+    radial-gradient(700px 500px at 80% 0%, rgba(96,165,250,.12), transparent 60%),
+    linear-gradient(160deg,#08172A 0%, #0F2A45 55%, #08172A 100%);
+}
+#stage::after{
+  content:"";position:absolute;inset:0;pointer-events:none;
+  background:linear-gradient(180deg,rgba(255,255,255,.03),transparent 30%);
+}
+
+/* ============ SLIDE ============ */
+.slide{
+  position:absolute; inset:0;
+  padding:36px 58px 56px;
+  display:flex; flex-direction:column; gap:14px;
+  opacity:0; visibility:hidden;
+  transform:translateY(26px) scale(.985);
+  transition:opacity .55s cubic-bezier(.22,.9,.3,1),
+             transform .55s cubic-bezier(.22,.9,.3,1),
+             visibility .55s;
+}
+.slide.active{opacity:1;visibility:visible;transform:none;}
+
+/* elemen bertahap */
+.f{opacity:0;transform:translateY(16px);transition:opacity .45s cubic-bezier(.22,.9,.3,1),transform .45s cubic-bezier(.22,.9,.3,1);}
+.f.show{opacity:1;transform:none;}
+
+/* ============ TIPOGRAFI ============ */
+.eyebrow{
+  font-size:14px;letter-spacing:.18em;text-transform:uppercase;
+  color:var(--accent);font-weight:700;opacity:.95;
+}
+h1.title{font-size:64px;line-height:1.05;margin:0;font-weight:800;letter-spacing:-.5px;}
+h2.title{font-size:38px;line-height:1.12;margin:0;font-weight:800;letter-spacing:-.3px;}
+h3{font-size:21px;margin:0 0 8px;font-weight:700;}
+.sub{font-size:22px;color:var(--muted);margin:0;line-height:1.4;}
+.lead{font-size:22px;line-height:1.45;margin:0;color:var(--text);}
+.hl{color:var(--accent);font-weight:800;}
+.hl2{color:var(--accent2);font-weight:800;}
+.hl3{color:var(--accent3);font-weight:800;}
+.grad{
+  background:linear-gradient(92deg,#34D399 0%,#60A5FA 45%,#F472B6 100%);
+  -webkit-background-clip:text;background-clip:text;color:transparent;
+}
+
+/* ============ LIST ============ */
+ul.bullets{list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:11px;}
+ul.bullets li{position:relative;padding-left:30px;font-size:22px;line-height:1.35;}
+ul.bullets li::before{content:"▸";position:absolute;left:2px;top:-1px;color:var(--accent);font-weight:900;font-size:21px;}
+ul.bullets.gold li::before{content:"★";color:var(--accent2);font-size:18px;top:1px;}
+ul.bullets.blue li::before{content:"◆";color:var(--accent3);font-size:16px;top:3px;}
+
+ol.steps{counter-reset:s;list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:12px;}
+ol.steps li{counter-increment:s;position:relative;padding-left:54px;font-size:21px;line-height:1.35;}
+ol.steps li::before{
+  content:counter(s);position:absolute;left:0;top:-3px;
+  width:36px;height:36px;border-radius:50%;
+  background:linear-gradient(135deg,#34D399,#0EA5A0);
+  color:#04231A;font-weight:800;font-size:18px;
+  display:flex;align-items:center;justify-content:center;
+  box-shadow:0 6px 16px rgba(52,211,153,.28);
+}
+
+/* ============ GRID & CARD ============ */
+.grid{display:grid;gap:14px;}
+.g2{grid-template-columns:1fr 1fr;}
+.g3{grid-template-columns:repeat(3,1fr);}
+.g4{grid-template-columns:repeat(4,1fr);}
+.card{
+  background:var(--card);border:1px solid var(--line);border-radius:16px;
+  padding:16px 18px;
+}
+.card h3{color:var(--accent);}
+.card p,.card li{font-size:19px;line-height:1.4;margin:0;color:var(--text);}
+.card ul{list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:5px;}
+.card ul li::before{content:"• ";color:var(--accent);font-weight:900;}
+.card.gold{border-color:rgba(251,146,60,.48);}
+.card.gold h3{color:var(--accent2);}
+.card.gold ul li::before{content:"• ";color:var(--accent2);}
+.card.blue{border-color:rgba(96,165,250,.48);}
+.card.blue h3{color:var(--accent3);}
+.card.blue ul li::before{content:"• ";color:var(--accent3);}
+.card.pink{border-color:rgba(244,114,182,.48);}
+.card.pink h3{color:var(--pink);}
+.card.pink ul li::before{content:"• ";color:var(--pink);}
+.card .big{font-size:36px;line-height:1;display:block;margin-bottom:4px;}
+
+/* ============ CHIP & BADGE ============ */
+.chip{
+  display:inline-flex;align-items:center;gap:6px;
+  padding:6px 14px;border-radius:999px;font-size:15px;font-weight:700;
+  background:rgba(52,211,153,.14);color:var(--accent);
+  border:1px solid rgba(52,211,153,.38);white-space:nowrap;
+}
+.chip.orange{background:rgba(251,146,60,.14);color:var(--accent2);border-color:rgba(251,146,60,.4);}
+.chip.blue{background:rgba(96,165,250,.14);color:var(--accent3);border-color:rgba(96,165,250,.4);}
+.chip.pink{background:rgba(244,114,182,.14);color:var(--pink);border-color:rgba(244,114,182,.4);}
+.badge{
+  display:inline-flex;align-items:center;gap:8px;
+  padding:9px 20px;border-radius:999px;
+  background:linear-gradient(90deg,rgba(52,211,153,.2),rgba(96,165,250,.18));
+  border:1px solid rgba(52,211,153,.5);
+  color:var(--text);font-weight:800;font-size:16px;letter-spacing:.08em;
+}
+.chips{display:flex;gap:9px;flex-wrap:wrap;}
+
+/* ============ CODE ============ */
+.code{
+  font-family:ui-monospace,SFMono-Regular,Consolas,"Courier New",monospace;
+  background:rgba(2,10,20,.62);
+  border-left:4px solid var(--accent);
+  border-radius:12px;
+  padding:14px 18px;
+  font-size:19px;line-height:1.5;
+  color:#D9F5E8;white-space:pre;overflow:auto;
+}
+.code.sm{font-size:16px;line-height:1.45;}
+.code .c{color:#7E9AB8;}
+.code .k{color:#FB923C;font-weight:700;}
+.code .s{color:#F472B6;}
+
+/* ============ FLOWCHART ============ */
+.flow{display:flex;align-items:center;justify-content:center;gap:12px;flex-wrap:wrap;}
+.flowcol{display:flex;flex-direction:column;align-items:center;gap:6px;}
+.node{
+  border:2px solid var(--line);
+  background:linear-gradient(180deg,rgba(255,255,255,.09),rgba(255,255,255,.04));
+  padding:10px 18px;border-radius:12px;
+  font-size:18px;font-weight:700;text-align:center;
+}
+.node.oval{border-radius:999px;border-color:rgba(96,165,250,.6);color:var(--accent3);}
+.node.diamond{
+  width:240px;height:120px;padding:0 40px;border:none;border-radius:0;
+  display:flex;align-items:center;justify-content:center;
+  background:rgba(96,165,250,.2);
+  clip-path:polygon(50% 0,100% 50%,50% 100%,0 50%);
+  font-size:17px;color:var(--text);text-align:center;line-height:1.2;
+}
+.node.good{background:rgba(52,211,153,.2);border-color:rgba(52,211,153,.6);color:var(--accent);}
+.node.bad{background:rgba(251,146,60,.2);border-color:rgba(251,146,60,.6);color:var(--accent2);}
+.arrow{color:var(--accent);font-size:22px;font-weight:900;line-height:1;}
+.branchLabel{font-size:14px;font-weight:800;color:var(--accent2);letter-spacing:.06em;}
+.branchrow{display:flex;gap:70px;justify-content:center;align-items:flex-start;}
+.branch{display:flex;flex-direction:column;align-items:center;gap:5px;}
+
+/* ============ TIMELINE ============ */
+.timeline{position:relative;padding-left:26px;display:flex;flex-direction:column;gap:13px;}
+.timeline::before{
+  content:"";position:absolute;left:7px;top:8px;bottom:8px;width:2px;
+  background:linear-gradient(180deg,var(--accent),var(--accent3),var(--pink));
+  border-radius:2px;
+}
+.tl{position:relative;font-size:18px;line-height:1.35;color:var(--text);}
+.tl::before{
+  content:"";position:absolute;left:-24px;top:6px;width:11px;height:11px;border-radius:50%;
+  background:var(--accent);box-shadow:0 0 0 4px rgba(52,211,153,.18);
+}
+.tl b{color:var(--accent3);}
+
+/* ============ TABEL ============ */
+table{width:100%;border-collapse:collapse;font-size:17px;border-radius:12px;overflow:hidden;}
+thead th{
+  background:rgba(52,211,153,.18);
+  color:var(--accent);
+  text-align:left;padding:9px 12px;font-size:16px;letter-spacing:.03em;
+  border-bottom:1px solid rgba(52,211,153,.4);
+}
+tbody td{padding:8px 12px;border-bottom:1px solid rgba(255,255,255,.07);}
+tbody tr:nth-child(even){background:rgba(255,255,255,.045);}
+tbody tr:last-child td{border-bottom:none;}
+
+/* ============ BUBBLE ============ */
+.bubble{
+  position:relative;
+  background:rgba(255,255,255,.08);
+  border:1px solid rgba(96,165,250,.4);
+  border-radius:18px;
+  padding:16px 22px;
+  font-size:22px;line-height:1.4;
+  color:var(--text);
+}
+.bubble::after{
+  content:"";position:absolute;left:44px;bottom:-13px;
+  width:0;height:0;border-left:12px solid transparent;border-right:12px solid transparent;
+  border-top:13px solid rgba(96,165,250,.4);
+}
+.bubble .who{display:block;font-size:14px;color:var(--accent3);font-weight:800;letter-spacing:.1em;margin-bottom:6px;}
+
+/* ============ FOOT ============ */
+.foot{margin-top:auto;display:flex;align-items:center;gap:10px;}
+
+/* ============ HUD / KONTROL ============ */
+#hud{
+  position:fixed;top:14px;right:20px;z-index:40;
+  display:flex;align-items:center;gap:10px;
+  font-size:14px;color:var(--muted);
+}
+#hud .dot{width:9px;height:9px;border-radius:50%;background:var(--accent);box-shadow:0 0 12px var(--accent);}
+#counter{
+  font-weight:800;color:var(--text);font-size:14px;letter-spacing:.06em;
+  background:rgba(8,23,42,.7);border:1px solid rgba(52,211,153,.3);
+  padding:6px 14px;border-radius:999px;
+}
+#ctrl{
+  position:fixed;bottom:16px;right:20px;z-index:40;display:flex;gap:8px;
+}
+#ctrl button{
+  width:44px;height:44px;border-radius:12px;cursor:pointer;
+  background:rgba(8,23,42,.78);color:var(--text);
+  border:1px solid rgba(52,211,153,.35);
+  font-size:17px;font-weight:800;
+  transition:.2s;
+}
+#ctrl button:hover{background:rgba(52,211,153,.22);transform:translateY(-2px);}
+#bar{
+  position:fixed;left:0;bottom:0;height:5px;width:0%;
+  background:linear-gradient(90deg,var(--accent),var(--accent3),var(--pink));
+  z-index:50;transition:width .45s cubic-bezier(.22,.9,.3,1);
+  box-shadow:0 0 14px rgba(52,211,153,.6);
+}
+#hint{
+  position:fixed;bottom:24px;left:50%;transform:translateX(-50%);
+  z-index:40;font-size:14px;color:var(--muted);
+  background:rgba(8,23,42,.75);border:1px solid rgba(255,255,255,.12);
+  padding:8px 18px;border-radius:999px;
+  transition:opacity .5s;
+}
+#hint.hide{opacity:0;pointer-events:none;}
+
+/* ============ COVER ============ */
+.cover{
+  margin:auto;text-align:center;display:flex;flex-direction:column;
+  align-items:center;gap:16px;max-width:1050px;
+}
+.cover h1{font-size:68px;}
+</style>
+</head>
+<body>
+
+<div id="stage">
+
+  <!-- ================= 1. COVER ================= -->
+  <section class="slide active">
+    <!-- Catatan guru: Slide pembuka. Sapa murid, ajak membaca judul bersama, tanyakan "apa itu pola?" -->
+    <div class="cover">
+      <div class="badge">🏫 SMP NEGERI 19 KOTA BEKASI</div>
+      <div class="eyebrow">Informatika · Kelas 8 · Fase D · Tim MGMP Informatika</div>
+      <h1 class="title grad">Perulangan dan Pola</h1>
+      <p class="sub">Merekap skor <b class="hl">5–10 siswa</b> dengan satu instruksi singkat</p>
+      <div class="chips" style="justify-content:center">
+        <span class="chip">Elemen: Algoritma &amp; Pemrograman</span>
+        <span class="chip orange">Discovery Learning + PjBL</span>
+        <span class="chip blue">2 × 40 menit · 1 pertemuan</span>
+      </div>
+      <p class="sub" style="font-size:17px">Pendekatan: Pembelajaran Mendalam · UDL · Computational Thinking</p>
+      <p class="sub" style="font-size:16px">Klik di mana saja atau tekan <b class="hl3">→</b> untuk memulai</p>
+    </div>
+  </section>
+
+  <!-- ================= 2. TUJUAN ================= -->
+  <section class="slide">
+    <!-- Catatan guru: Bacakan tujuan, tekankan bahwa perulangan membuat kerja jadi lebih hemat. -->
+    <div class="eyebrow">Slide 2 · Tujuan</div>
+    <h2 class="title">Tujuan Pembelajaran</h2>
+    <div class="grid g2" style="align-items:start">
+      <ul class="bullets">
+        <li class="f">Mengenali <b class="hl">pola</b> di sekitar kita</li>
+        <li class="f">Menjelaskan arti <b class="hl3">perulangan</b> dengan kata sendiri</li>
+        <li class="f">Membedakan <b class="hl">ulangi N kali</b> dan <b class="hl2">ulangi selama</b></li>
+        <li class="f">Menyusun algoritma rekap nilai 5–10 siswa</li>
+        <li class="f">Menerapkan <b class="hl3">Computational Thinking</b></li>
+      </ul>
+      <div class="card blue f">
+        <h3>🧭 Alur Pertemuan</h3>
+        <div class="timeline" style="margin-top:10px">
+          <div class="tl"><b>10'</b> — Apersepsi: pola di sekitar</div>
+          <div class="tl"><b>25'</b> — Materi: pola → perulangan</div>
+          <div class="tl"><b>35'</b> — Tantangan kelompok berjenjang</div>
+          <div class="tl"><b>10'</b> — Presentasi, refleksi, penutup</div>
+        </div>
+      </div>
+    </div>
+    <div class="foot"><span class="chip">⏱ 3 menit</span></div>
+  </section>
+
+  <!-- ================= 3. APERSEPSI ================= -->
+  <section class="slide">
+    <!-- Catatan guru: Tanyakan dulu ke 2-3 murid sebelum menampilkan kartu. Jangan langsung memberi jawaban. -->
+    <div class="eyebrow">Slide 3 · Apersepsi</div>
+    <h2 class="title">Pernahkah Kalian Merasa Capek Mengulang?</h2>
+    <div class="bubble f">
+      <span class="who">PERTANYAAN PEMANTIK</span>
+      "Rapikan buku 1, rapikan buku 2, rapikan buku 3…" sampai buku ke-20.
+      Padahal cukup dikatakan sekali: <b class="hl">"Rapikan semua buku, satu per satu, sampai habis!"</b>
+    </div>
+    <div class="grid g3" style="margin-top:10px">
+      <div class="card f"><h3>🤔 Pertanyaan 1</h3><p>Kegiatan apa yang biasa kamu ulang di rumah?</p></div>
+      <div class="card gold f"><h3>🤔 Pertanyaan 2</h3><p>Bisakah komputer disuruh mengulang?</p></div>
+      <div class="card blue f"><h3>🤔 Pertanyaan 3</h3><p>Bagaimana caranya menulis perintah singkat?</p></div>
+    </div>
+    <div class="foot"><span class="chip">⏱ 6 menit</span><span class="chip blue">Diskusi lisan</span></div>
+  </section>
+
+  <!-- ================= 4. DEFINISI ================= -->
+  <section class="slide">
+    <!-- Catatan guru: Gunakan analogi menyapu lantai — diulang sampai bersih. -->
+    <div class="eyebrow">Slide 4 · Definisi</div>
+    <h2 class="title">Apa Itu Pola dan Perulangan?</h2>
+    <div class="grid g2">
+      <div class="card f">
+        <h3>🔁 Analogi: Menyapu Lantai</h3>
+        <p><b class="hl">Pola</b> = gerakan menyapu yang sama, diulang terus. <b class="hl3">Perulangan</b> = cara menuliskannya sekali saja.</p>
+      </div>
+      <div class="card gold f">
+        <h3>🎼 Analogi: Lagu Anak Ayam</h3>
+        <p>"Turut ibunya… satu mati, tinggal enam…" — polanya <b class="hl2">menurun berulang</b>, aturannya tetap.</p>
+      </div>
+    </div>
+    <p class="lead f"><span class="hl">Kesimpulan:</span> pola = hal yang berulang dengan aturan tetap. Perulangan = cara menuliskan pola itu <b>singkat</b>.</p>
+    <div class="foot"><span class="chip">⏱ 4 menit</span></div>
+  </section>
+
+  <!-- ================= 5. CONTOH NYATA ================= -->
+  <section class="slide">
+    <!-- Catatan guru: Minta murid menebak pola pada tiap gambar sebelum ditampilkan. -->
+    <div class="eyebrow">Slide 5 · Contoh Nyata</div>
+    <h2 class="title">Pola di Sekitar Kita</h2>
+    <div class="grid g4" style="align-items:stretch">
+      <div class="card f"><span class="big">♟️</span><h3>Lantai Catur</h3><p>Hitam–putih–hitam–putih…</p></div>
+      <div class="card gold f"><span class="big">🧵</span><h3>Motif Batik</h3><p>Bentuk sama, diulang membentuk kain</p></div>
+      <div class="card blue f"><span class="big">📅</span><h3>Jadwal Piket</h3><p>Bergilir per kelompok setiap minggu</p></div>
+      <div class="card pink f"><span class="big">🤸</span><h3>Senam Pagi</h3><p>8 hitungan, lalu diulang dari awal</p></div>
+    </div>
+    <p class="lead f">Semua contoh itu punya <b class="hl">aturan tetap</b> yang bisa kita tulis jadi algoritma.</p>
+    <div class="foot"><span class="chip">⏱ 4 menit</span></div>
+  </section>
+
+  <!-- ================= 6. BENTUK-BENTUK ================= -->
+  <section class="slide">
+    <!-- Catatan guru: Ini peta materi — tiga bentuk perulangan yang akan dibahas satu per satu. -->
+    <div class="eyebrow">Slide 6 · Inti Materi</div>
+    <h2 class="title">Tiga Cara Menulis Perulangan</h2>
+    <div class="grid g3">
+      <div class="card f"><h3>1️⃣ Tanpa Perulangan</h3><p>Tulis aksi satu per satu. Boros dan mudah salah.</p></div>
+      <div class="card gold f"><h3>2️⃣ Ulangi N Kali</h3><p>Jumlah pengulangan sudah <b class="hl2">pasti</b> diketahui.</p></div>
+      <div class="card blue f"><h3>3️⃣ Ulangi Selama</h3><p>Belum pasti berapa kali, berhenti saat <b class="hl3">kondisi</b> berubah.</p></div>
+    </div>
+    <p class="lead f">Makin ke kanan, makin <b class="hl">cerdas</b> dan ringkas instruksinya.</p>
+    <div class="foot"><span class="chip">⏱ 3 menit</span></div>
+  </section>
+
+  <!-- ================= 7. TANPA PERULANGAN ================= -->
+  <section class="slide">
+    <!-- Catatan guru: Tunjukkan berapa banyak baris yang harus ditulis jika 30 siswa. -->
+    <div class="eyebrow">Slide 7 · Bentuk 1</div>
+    <h2 class="title">Cara 1: Tanpa Perulangan</h2>
+    <div class="grid g2" style="align-items:start">
+      <div class="code f">Tepuk tangan
+Tepuk tangan
+Tepuk tangan
+Tepuk tangan
+Tepuk tangan</div>
+      <div class="f">
+        <div class="chips" style="margin-bottom:10px">
+          <span class="chip pink">panjang</span>
+          <span class="chip orange">mudah salah hitung</span>
+          <span class="chip blue">sulit diperbaiki</span>
+        </div>
+        <ul class="bullets">
+          <li>Aksi ditulis berulang satu per satu</li>
+          <li>Boros baris dan tenaga</li>
+          <li>Jika 1000 kali → sangat melelahkan!</li>
+        </ul>
+      </div>
+    </div>
+    <div class="foot"><span class="chip">⏱ 4 menit</span></div>
+  </section>
+
+  <!-- ================= 8. ULANGI N KALI ================= -->
+  <section class="slide">
+    <!-- Catatan guru: Tekankan bahwa hasilnya sama persis, hanya penulisannya lebih ringkas. -->
+    <div class="eyebrow">Slide 8 · Bentuk 2</div>
+    <h2 class="title">Cara 2: Ulangi N Kali</h2>
+    <div class="grid g2" style="align-items:start">
+      <div class="code f">ULANGI 5 KALI
+    Tepuk tangan
+SELESAI</div>
+      <div class="f">
+        <div class="chips" style="margin-bottom:10px">
+          <span class="chip">hasil sama</span>
+          <span class="chip blue">5 baris → 3 baris</span>
+          <span class="chip orange">jumlah pasti</span>
+        </div>
+        <ul class="bullets blue">
+          <li>Dipakai saat jumlah sudah <b class="hl">pasti</b></li>
+          <li>Contoh: baca doa 3 kali</li>
+          <li>Contoh: cetak nilai 8 siswa</li>
+        </ul>
+      </div>
+    </div>
+    <div class="foot"><span class="chip">⏱ 5 menit</span></div>
+  </section>
+
+  <!-- ================= 9. ULANGI SELAMA ================= -->
+  <section class="slide">
+    <!-- Catatan guru: Jelaskan bahwa komputer memeriksa kondisi sebelum setiap putaran. -->
+    <div class="eyebrow">Slide 9 · Bentuk 3</div>
+    <h2 class="title">Cara 3: Ulangi Selama Kondisi</h2>
+    <div class="grid g2" style="align-items:start">
+      <div class="code sm f">SELAMA masih ada siswa mengantre
+    Panggil nomor antrean berikutnya
+SELESAI</div>
+      <div class="f">
+        <div class="chips" style="margin-bottom:10px">
+          <span class="chip">berhenti saat kondisi salah</span>
+          <span class="chip blue">jumlah belum pasti</span>
+        </div>
+        <ul class="bullets gold">
+          <li>Contoh: kayuh sepeda sampai sekolah</li>
+          <li>Contoh: aduk adonan sampai halus</li>
+          <li>Cocok untuk antrean yang tidak diketahui panjangnya</li>
+        </ul>
+      </div>
+    </div>
+    <div class="foot"><span class="chip">⏱ 5 menit</span></div>
+  </section>
+
+  <!-- ================= 10. CARA KERJA ================= -->
+  <section class="slide">
+    <!-- Catatan guru: Minta murid menyebutkan urutan ini bersama-sama dengan suara lantang. -->
+    <div class="eyebrow">Slide 10 · Cara Kerja</div>
+    <h2 class="title">Bagaimana Perulangan Bekerja?</h2>
+    <ol class="steps">
+      <li class="f">Komputer membaca perintah <b class="hl">ULANGI</b></li>
+      <li class="f">Cek dulu: apakah masih perlu diulang?</li>
+      <li class="f">Jika masih → jalankan aksi di dalamnya</li>
+      <li class="f">Hitung sudah berapa kali berulang</li>
+      <li class="f">Jika belum cukup → kembali ke langkah 2</li>
+      <li class="f">Jika sudah cukup → lanjut perintah berikutnya</li>
+    </ol>
+    <div class="foot"><span class="chip">⏱ 5 menit</span></div>
+  </section>
+
+  <!-- ================= 11. TABEL PERBANDINGAN ================= -->
+  <section class="slide">
+    <!-- Catatan guru: Tanyakan kapan pakai yang mana; ini kunci pemahaman murid. -->
+    <div class="eyebrow">Slide 11 · Aturan</div>
+    <h2 class="title">Kapan Pakai yang Mana?</h2>
+    <table class="f">
+      <thead>
+        <tr><th>Aspek</th><th>Ulangi N Kali</th><th>Ulangi Selama Kondisi</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><b class="hl">Dipakai saat</b></td><td>Jumlah sudah pasti</td><td>Jumlah belum pasti</td></tr>
+        <tr><td><b class="hl3">Berhenti karena</b></td><td>Hitungan tercapai</td><td>Kondisi jadi salah</td></tr>
+        <tr><td><b class="hl2">Contoh</b></td><td>Tepuk tangan 5 kali</td><td>Kayuh sampai sekolah</td></tr>
+        <tr><td><b class="hl">Rekap skor</b></td><td>Cetak 8 nilai siswa</td><td>Cetak selama data masih ada</td></tr>
+      </tbody>
+    </table>
+    <div class="chips f"><span class="chip">pasti → N kali</span><span class="chip blue">belum pasti → selama</span></div>
+    <div class="foot"><span class="chip">⏱ 5 menit</span></div>
+  </section>
+
+  <!-- ================= 12. FLOWCHART ================= -->
+  <section class="slide">
+    <!-- Catatan guru: Gambarkan di papan tulis sambil menunjuk tiap simbol. -->
+    <div class="eyebrow">Slide 12 · Flowchart</div>
+    <h2 class="title">Alur Rekap Nilai 8 Siswa</h2>
+    <div class="flowcol f" style="gap:5px">
+      <div class="node oval">Mulai</div>
+      <div class="arrow">▼</div>
+      <div class="node">total = 0 · i = 1</div>
+      <div class="arrow">▼</div>
+      <div class="node diamond"><span>i ≤ 8 ?</span></div>
+      <div class="branchrow" style="margin-top:5px">
+        <div class="branch">
+          <span class="branchLabel">YA</span>
+          <div class="arrow">↓</div>
+          <div class="node good">Tampilkan nama &amp; nilai siswa-i<br>total = total + nilai · i = i + 1</div>
+        </div>
+        <div class="branch">
+          <span class="branchLabel">TIDAK</span>
+          <div class="arrow">↓</div>
+          <div class="node bad">Hitung rata-rata = total / 8</div>
+        </div>
+      </div>
+      <div class="arrow" style="margin-top:6px">▼</div>
+      <div class="node oval">Selesai</div>
+    </div>
+    <div class="foot"><span class="chip">⏱ 6 menit</span><span class="chip blue">Belah ketupat = kondisi</span></div>
+  </section>
+
+  <!-- ================= 13. KODE LENGKAP ================= -->
+  <section class="slide">
+    <!-- Catatan guru: Tunjukkan bahwa kode ini persis mengikuti flowchart di slide sebelumnya. -->
+    <div class="eyebrow">Slide 13 · Kode Lengkap</div>
+    <h2 class="title">Rekap Nilai dengan Perulangan</h2>
+    <div class="grid g2" style="align-items:start">
+      <div class="code sm f"><span class="c"># data nilai 8 siswa</span>
+nama  = [<span class="s">"Andi"</span>,<span class="s">"Bella"</span>,<span class="s">"Citra"</span>,<span class="s">"Dedi"</span>,
+         <span class="s">"Eka"</span>,<span class="s">"Fajar"</span>,<span class="s">"Gita"</span>,<span class="s">"Hana"</span>]
+nilai = [78, 92, 65, 88, 74, 95, 60, 83]
+
+total = 0
+<span class="k">for</span> i <span class="k">in</span> range(8):
+    print(nama[i], <span class="s">":"</span>, nilai[i])
+    total = total + nilai[i]
+
+rata = total / 8
+print(<span class="s">"Total:"</span>, total)
+print(<span class="s">"Rata-rata:"</span>, rata)</div>
+      <div class="f">
+        <div class="chips" style="margin-bottom:10px">
+          <span class="chip">list → kumpulan data</span>
+          <span class="chip blue">for → ulangi N kali</span>
+          <span class="chip orange">total bertambah terus</span>
+        </div>
+        <ul class="bullets">
+          <li>8 data → tetap 1 blok perintah</li>
+          <li>Ganti angka 8 jadi 30? Masih jalan!</li>
+          <li>rata = total dibagi jumlah siswa</li>
+        </ul>
+      </div>
+    </div>
+    <div class="foot"><span class="chip">⏱ 7 menit</span></div>
+  </section>
+
+  <!-- ================= 14. KESALAHAN UMUM ================= -->
+  <section class="slide">
+    <!-- Catatan guru: Minta murid menemukan kesalahan sebelum jawaban ditampilkan. -->
+    <div class="eyebrow">Slide 14 · Peringatan</div>
+    <h2 class="title">Kesalahan yang Sering Terjadi</h2>
+    <div class="grid g2">
+      <div class="card pink f">
+        <h3>❌ Salah</h3>
+        <div class="code sm" style="border-left-color:#F472B6;margin-top:8px">total = 0
+<span class="k">for</span> i <span class="k">in</span> range(8):
+total = total + nilai[i]</div>
+        <ul style="margin-top:10px">
+          <li>Tidak ada indentasi</li>
+          <li>total diletakkan di dalam loop</li>
+          <li>Lupa menambah i</li>
+        </ul>
+      </div>
+      <div class="card f">
+        <h3>✅ Benar</h3>
+        <div class="code sm" style="margin-top:8px">total = 0
+<span class="k">for</span> i <span class="k">in</span> range(8):
+    total = total + nilai[i]</div>
+        <ul style="margin-top:10px">
+          <li>Baris aksi menjorok 4 spasi</li>
+          <li>total = 0 di <b class="hl">luar</b> loop</li>
+          <li>Perintah diakhiri <b class="hl">:</b></li>
+        </ul>
+      </div>
+    </div>
+    <div class="foot"><span class="chip">⏱ 5 menit</span></div>
+  </section>
+
+  <!-- ================= 15. ANALOGI TAMBAHAN ================= -->
+  <section class="slide">
+    <!-- Catatan guru: Analogi antrean kantin sangat dekat dengan keseharian murid. -->
+    <div class="eyebrow">Slide 15 · Analogi</div>
+    <h2 class="title">Antrean Kantin = Ulangi Selama</h2>
+    <p class="lead f">Antrean bisa panjang atau pendek — kita tidak tahu. Kita berhenti saat <b class="hl">sudah dapat makanan</b>.</p>
+    <div class="code f">antre = <span class="k">True</span>
+<span class="k">while</span> antre:
+    print(<span class="s">"Majukan langkah"</span>)
+    <span class="k">if</span> sudah_di_depan:
+        antre = <span class="k">False</span>
+print(<span class="s">"Ambil makanan"</span>)</div>
+    <div class="chips f">
+      <span class="chip">while → ulangi selama</span>
+      <span class="chip blue">kondisi dicek tiap putaran</span>
+      <span class="chip orange">berhenti saat kondisi False</span>
+    </div>
+    <div class="foot"><span class="chip">⏱ 4 menit</span></div>
+  </section>
+
+  <!-- ================= 16. AKTIVITAS KELOMPOK ================= -->
+  <section class="slide">
+    <!-- Catatan guru: Bagi kelas menjadi 4–6 kelompok. Setiap kelompok memilih satu tantangan sesuai kesiapan. -->
+    <div class="eyebrow">Slide 16 · Aktivitas Kelompok</div>
+    <h2 class="title">Pilih Tantanganmu</h2>
+    <div class="grid g4">
+      <div class="card f"><span class="big">⭐</span><h3>Pemula</h3><p>Pola bintang segitiga <b class="hl">5 baris</b> dengan ULANGI N KALI</p></div>
+      <div class="card gold f"><span class="big">📊</span><h3>Menengah</h3><p>Rekap nilai <b class="hl2">5 siswa</b> + hitung rata-rata</p></div>
+      <div class="card blue f"><span class="big">🎯</span><h3>Lanjutan</h3><p>Status <b class="hl3">Lulus/Remedial</b> 10 siswa</p></div>
+      <div class="card pink f"><span class="big">🎨</span><h3>Bebas</h3><p>Pola lain di sekitar, tulis algoritmanya</p></div>
+    </div>
+    <p class="lead f">Boleh dikerjakan di kertas, gambar, atau kartu instruksi.</p>
+    <div class="foot"><span class="chip">⏱ 15 menit</span><span class="chip blue">4–5 orang per kelompok</span></div>
+  </section>
+
+  <!-- ================= 17. LANGKAH KERJA ================= -->
+  <section class="slide">
+    <!-- Catatan guru: Tempel langkah ini di papan tulis sebagai pengingat selama kerja kelompok. -->
+    <div class="eyebrow">Slide 17 · Langkah Kerja</div>
+    <h2 class="title">Cara Mengerjakan Tantangan</h2>
+    <ol class="steps">
+      <li class="f"><b class="hl">Amati</b> — temukan bagian yang berulang</li>
+      <li class="f"><b class="hl3">Sederhanakan</b> — tulis satu aksi yang mewakili</li>
+      <li class="f"><b class="hl2">Bungkus</b> — masukkan ke ULANGI / SELAMA</li>
+      <li class="f">Uji dengan <b class="hl">contoh data</b> berbeda</li>
+      <li class="f">Tukar dengan teman untuk <b class="hl3">peer debugging</b></li>
+      <li class="f">Siapkan presentasi 2 menit</li>
+    </ol>
+    <div class="chips f">
+      <span class="chip">Bekerja sama</span>
+      <span class="chip blue">Teliti</span>
+      <span class="chip orange">Berani mencoba</span>
+    </div>
+    <div class="foot"><span class="chip">⏱ 3 menit</span></div>
+  </section>
+
+  <!-- ================= 18. KUIS KILAT ================= -->
+  <section class="slide">
+    <!-- Catatan guru: Klik sekali untuk memunculkan jawaban. Minta murid menjawab dulu sebelum diklik. -->
+    <div class="eyebrow">Slide 18 · Cek Pemahaman</div>
+    <h2 class="title">Kuis Kilat</h2>
+    <div class="grid g3">
+      <div class="card f">
+        <h3>Soal 1</h3>
+        <p>Kapan pakai <b class="hl">ulangi N kali</b>?</p>
+        <p class="f" style="margin-top:8px;color:var(--accent)"><b>Jawab: saat jumlah sudah pasti</b></p>
+      </div>
+      <div class="card gold f">
+        <h3>Soal 2</h3>
+        <p>Kapan pakai <b class="hl2">ulangi selama</b>?</p>
+        <p class="f" style="margin-top:8px;color:var(--accent2)"><b>Jawab: saat belum pasti, berhenti jika kondisi salah</b></p>
+      </div>
+      <div class="card blue f">
+        <h3>Soal 3</h3>
+        <p>Apa untung perulangan pada rekap nilai?</p>
+        <p class="f" style="margin-top:8px;color:var(--accent3)"><b>Jawab: 1 blok instruksi untuk semua siswa</b></p>
+      </div>
+    </div>
+    <p class="lead f">Angkat tangan kalau sudah tahu jawabannya! ✋</p>
+    <div class="foot"><span class="chip">⏱ 5 menit</span></div>
+  </section>
+
+  <!-- ================= 19. REFLEKSI ================= -->
+  <section class="slide">
+    <!-- Catatan guru: Minta 3 murid membacakan refleksinya secara singkat. -->
+    <div class="eyebrow">Slide 19 · Refleksi</div>
+    <h2 class="title">Refleksi Pembelajaran Mendalam</h2>
+    <div class="grid g3">
+      <div class="card f">
+        <h3>💡 Memahami</h3>
+        <ul>
+          <li>Beda "N kali" vs "selama"?</li>
+          <li>Bagaimana pola membantu?</li>
+        </ul>
+      </div>
+      <div class="card gold f">
+        <h3>🛠️ Mengaplikasi</h3>
+        <ul>
+          <li>Bagian mana paling menantang?</li>
+          <li>Bagaimana kamu mengatasinya?</li>
+        </ul>
+      </div>
+      <div class="card blue f">
+        <h3>🪞 Merefleksi</h3>
+        <ul>
+          <li>Kegiatan apa yang bisa disederhanakan?</li>
+          <li>Bagaimana perasaanmu hari ini?</li>
+        </ul>
+      </div>
+    </div>
+    <p class="lead f">Tuliskan satu kalimat refleksi di buku catatanmu. ✍️</p>
+    <div class="foot"><span class="chip">⏱ 4 menit</span></div>
+  </section>
+
+  <!-- ================= 20. RUBRIK ================= -->
+  <section class="slide">
+    <!-- Catatan guru: Tunjukkan rubrik sebelum presentasi agar murid tahu target penilaiannya. -->
+    <div class="eyebrow">Slide 20 · Penilaian</div>
+    <h2 class="title">Rubrik Penilaian (Skala 1–4)</h2>
+    <table class="f">
+      <thead>
+        <tr><th>Kriteria</th><th>4 — Sangat Baik</th><th>3 — Baik</th><th>2 — Cukup</th><th>1 — Perlu Bimbingan</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><b class="hl">Pemahaman Konsep</b></td><td>Menjelaskan tepat, bahasa sendiri</td><td>Paham, kurang lengkap</td><td>Sebagian paham</td><td>Belum paham</td></tr>
+        <tr><td><b class="hl3">Computational Thinking</b></td><td>Algoritma benar &amp; efisien</td><td>Benar, kurang efisien</td><td>Sebagian benar</td><td>Belum sesuai pola</td></tr>
+        <tr><td><b class="hl2">Kolaborasi &amp; Komunikasi</b></td><td>Masukan jelas &amp; membangun</td><td>Cukup jelas</td><td>Kurang membangun</td><td>Sulit menyampaikan</td></tr>
+        <tr><td><b class="hl">Kemandirian &amp; Refleksi</b></td><td>Mandiri &amp; refleksi baik</td><td>Cukup mandiri</td><td>Perlu bimbingan sesekali</td><td>Sangat bergantung guru</td></tr>
+      </tbody>
+    </table>
+    <div class="foot"><span class="chip">⏱ 3 menit</span></div>
+  </section>
+
+  <!-- ================= 21. RANGKUMAN ================= -->
+  <section class="slide">
+    <!-- Catatan guru: Bacakan rangkuman dengan tempo lambat sebagai penutup materi. -->
+    <div class="eyebrow">Slide 21 · Rangkuman</div>
+    <h2 class="title">Rangkuman Hari Ini</h2>
+    <ul class="bullets gold">
+      <li class="f"><b class="hl">Pola</b> = sesuatu yang berulang dengan aturan tetap</li>
+      <li class="f"><b class="hl">Perulangan</b> = cara menulis pola secara singkat</li>
+      <li class="f"><b class="hl3">Ulangi N kali</b> → jumlah sudah pasti</li>
+      <li class="f"><b class="hl2">Ulangi selama</b> → berhenti saat kondisi salah</li>
+      <li class="f">Rekap 8 nilai siswa → cukup <b class="hl">1 blok</b> perintah</li>
+      <li class="f">Pola + perulangan = kerja lebih hemat &amp; rapi</li>
+    </ul>
+    <div class="foot"><span class="chip">⏱ 3 menit</span></div>
+  </section>
+
+  <!-- ================= 22. TINDAK LANJUT ================= -->
+  <section class="slide">
+    <!-- Catatan guru: Sampaikan tenggat tugas rumah dengan jelas. -->
+    <div class="eyebrow">Slide 22 · Tindak Lanjut</div>
+    <h2 class="title">Setelah Pertemuan Ini</h2>
+    <div class="grid g2">
+      <div class="card f">
+        <h3>🏠 Tugas Rumah</h3>
+        <ul>
+          <li>Amati satu pola di rumahmu</li>
+          <li>Tulis aturan pengulangannya</li>
+          <li>Gambar flowchart sederhana</li>
+        </ul>
+      </div>
+      <div class="card blue f">
+        <h3>➡️ Pertemuan Berikutnya</h3>
+        <ul>
+          <li>Perulangan bersarang (<i>nested loop</i>)</li>
+          <li>Kombinasi perulangan + percabangan</li>
+          <li>Proyek mini: rapor kelas</li>
+        </ul>
+      </div>
+    </div>
+    <div class="foot"><span class="chip">⏱ 2 menit</span></div>
+  </section>
+
+  <!-- ================= 23. PENUTUP ================= -->
+  <section class="slide">
+    <!-- Catatan guru: Akhiri dengan tepuk tangan dan kalimat motivasi. -->
+    <div class="cover">
+      <div class="eyebrow">Slide 23 · Penutup</div>
+      <h1 class="title grad">Terima Kasih</h1>
+      <p class="sub" style="font-size:25px;max-width:960px">
+        "Satu perintah yang tepat dapat menggantikan seribu perintah yang sama —
+        <b class="hl">belajarlah menemukan pola, maka kerjamu akan jauh lebih ringan.</b>"
+      </p>
+      <div class="chips" style="justify-content:center">
+        <span class="chip">Tim MGMP Informatika</span>
+        <span class="chip blue">SMP Negeri 19 Kota Bekasi</span>
+        <span class="chip orange">Kelas 8 · Fase D</span>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<!-- ============ HUD & KONTROL ============ -->
+<div id="hud">
+  <span class="dot"></span>
+  <span>Informatika · Kelas 8</span>
+  <span id="counter">1 / 23</span>
+</div>
+
+<div id="ctrl">
+  <button id="prev" title="Sebelumnya (←)">◀</button>
+  <button id="next" title="Berikutnya (→)">▶</button>
+  <button id="fs" title="Fullscreen (F)">⛶</button>
+</div>
+
+<div id="bar"></div>
+<div id="hint">Klik / tekan → untuk lanjut</div>
+
+<script>
+(function(){
+  const stage   = document.getElementById('stage');
+  const slides  = Array.from(document.querySelectorAll('.slide'));
+  const counter = document.getElementById('counter');
+  const bar     = document.getElementById('bar');
+  const hint    = document.getElementById('hint');
+  const prevBtn = document.getElementById('prev');
+  const nextBtn = document.getElementById('next');
+  const fsBtn   = document.getElementById('fs');
+
+  let i = 0;
+  let hintHidden = false;
+
+  /* ---------- Skala otomatis 16:9 ---------- */
+  function fit(){
+    const s = Math.min(window.innerWidth / 1280, window.innerHeight / 720);
+    stage.style.transform = 'translate(-50%,-50%) scale(' + s + ')';
+  }
+  window.addEventListener('resize', fit);
+  fit();
+
+  /* ---------- Render ---------- */
+  function render(){
+    slides.forEach(function(s, k){
+      const on = (k === i);
+      s.classList.toggle('active', on);
+      if (!on){
+        s.querySelectorAll('.f.show').forEach(function(el){
+          el.classList.remove('show');
+        });
+      }
+    });
+    counter.textContent = (i + 1) + ' / ' + slides.length;
+    bar.style.width = ((i + 1) / slides.length * 100) + '%';
+  }
+
+  /* ---------- Reveal bertahap ---------- */
+  function revealNext(){
+    const cur = slides[i];
+    const nxt = cur.querySelector('.f:not(.show)');
+    if (nxt){ nxt.classList.add('show'); return true; }
+    return false;
+  }
+
+  function hideHint(){
+    if (!hintHidden){ hintHidden = true; hint.classList.add('hide'); }
+  }
+
+  function next(){
+    hideHint();
+    if (revealNext()) return;
+    if (i < slides.length - 1){ i++; render(); }
+  }
+
+  function prev(){
+    hideHint();
+    if (i > 0){ i--; render(); }
+  }
+
+  function first(){ hideHint(); i = 0; render(); }
+  function last(){  hideHint(); i = slides.length - 1; render(); }
+
+  /* ---------- Klik di mana saja ---------- */
+  document.addEventListener('click', function(e){
+    if (e.target.closest('#ctrl')) return;
+    next();
+  });
+
+  /* ---------- Tombol ---------- */
+  prevBtn.addEventListener('click', function(e){ e.stopPropagation(); prev(); });
+  nextBtn.addEventListener('click', function(e){ e.stopPropagation(); next(); });
+  fsBtn.addEventListener('click', function(e){
+    e.stopPropagation();
+    toggleFullscreen();
+  });
+
+  /* ---------- Keyboard ---------- */
+  document.addEventListener('keydown', function(e){
+    const k = e.key;
+    if (k === 'ArrowRight' || k === 'ArrowDown' || k === ' ' ||
+        k === 'PageDown'  || k === 'Enter'){
+      e.preventDefault(); next();
+    } else if (k === 'ArrowLeft' || k === 'ArrowUp' || k === 'PageUp'){
+      e.preventDefault(); prev();
+    } else if (k === 'Home'){ e.preventDefault(); first(); }
+      else if (k === 'End'){  e.preventDefault(); last(); }
+      else if (k === 'f' || k === 'F'){ e.preventDefault(); toggleFullscreen(); }
+  });
+
+  /* ---------- Fullscreen ---------- */
+  function toggleFullscreen(){
+    if (!document.fullscreenElement){
+      if (document.documentElement.requestFullscreen){
+        document.documentElement.requestFullscreen();
+      }
+    } else {
+      if (document.exitFullscreen) document.exitFullscreen();
+    }
+  }
+
+  /* ---------- Mulai ---------- */
+  render();
+  setTimeout(fit, 60);
+})();
+</script>
+</body>
+</html>
